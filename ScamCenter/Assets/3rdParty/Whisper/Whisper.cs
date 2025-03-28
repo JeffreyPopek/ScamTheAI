@@ -1,23 +1,33 @@
 ﻿using OpenAI;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
+        [SerializeField] private OpenAIController controller;
         [SerializeField] private Button recordButton;
-        [SerializeField] private Image progressBar;
-        [SerializeField] private Text message;
+        [SerializeField] private Button stopRecordButton;
         [SerializeField] private Dropdown dropdown;
         
         private readonly string fileName = "output.wav";
-        private readonly int duration = 5;
+        private readonly int duration = 20;
         
         private AudioClip clip;
         private bool isRecording;
         private float time;
         private OpenAIApi openai = new OpenAIApi();
+        
+        
+        // message to send to ai
+        private string _messageToSend;
+
+        public string GetMessage()
+        {
+            return _messageToSend;
+        }
 
         private void Start()
         {
@@ -29,12 +39,14 @@ namespace Samples.Whisper
                 dropdown.options.Add(new Dropdown.OptionData(device));
             }
             recordButton.onClick.AddListener(StartRecording);
+            stopRecordButton.onClick.AddListener(EndRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
             
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
             #endif
         }
+        
 
         private void ChangeMicrophone(int index)
         {
@@ -43,6 +55,8 @@ namespace Samples.Whisper
         
         private void StartRecording()
         {
+            Debug.Log("Recording...");
+            
             isRecording = true;
             recordButton.enabled = false;
 
@@ -55,7 +69,8 @@ namespace Samples.Whisper
 
         private async void EndRecording()
         {
-            message.text = "Transcripting...";
+            Debug.Log("Finished Recording, transcribing message...");
+            //message.text = "Transcripting...";
             
             #if !UNITY_WEBGL
             Microphone.End(null);
@@ -72,17 +87,23 @@ namespace Samples.Whisper
             };
             var res = await openai.CreateAudioTranscription(req);
 
-            progressBar.fillAmount = 0;
-            message.text = res.Text;
+            // progressBar.fillAmount = 0;
+            // message.text = res.Text;
+            controller.messageToSend = res.Text;
+            controller.GetResponse();
+            
             recordButton.enabled = true;
         }
 
         private void Update()
         {
+            // if (Input.GetMouseButtonDown(0) && !isRecording)
+            //     StartRecording();
+            
             if (isRecording)
             {
                 time += Time.deltaTime;
-                progressBar.fillAmount = time / duration;
+                // progressBar.fillAmount = time / duration;
                 
                 if (time >= duration)
                 {
@@ -90,7 +111,15 @@ namespace Samples.Whisper
                     isRecording = false;
                     EndRecording();
                 }
+                //
+                // if (Input.GetMouseButtonUp(0))
+                // {
+                //     isRecording = false;
+                //     EndRecording();
+                // }
             }
         }
+        
+        
     }
 }

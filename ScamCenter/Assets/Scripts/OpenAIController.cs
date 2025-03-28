@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using OpenAI_API;
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
+using Samples.Whisper;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class OpenAIController : MonoBehaviour
 {
+    [SerializeField] private Whisper whisper;
     [SerializeField] private TextMeshProUGUI textField;
     [SerializeField] private TextMeshProUGUI inputField;
     [SerializeField] private Button okButton;
+    [SerializeField] private Button stopRecordingButton; // just to listen for an event
 
     private OpenAIAPI _api;
     private List<ChatMessage> _messages;
+
+    public string messageToSend = "";
 
     // DO NOT CALL API MORE THAN ONCE A FRAME IT COSTS MONEY
     private void Start()
@@ -22,7 +28,15 @@ public class OpenAIController : MonoBehaviour
         _api = new OpenAIAPI(Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User));
         StartConversation();
         okButton.onClick.AddListener(() => GetResponse());
+        // stopRecordingButton.onClick.AddListener(() => SetMessageToSend());
     }
+
+    // private void SetMessageToSend()
+    // {
+    //     Debug.Log("here!");
+    //     messageToSend = whisper.GetMessage();
+    //     GetResponse();
+    // }
     
     private void StartConversation()
     {
@@ -40,7 +54,7 @@ public class OpenAIController : MonoBehaviour
         Debug.Log(startString);
     }
 
-    private async void GetResponse()
+    public async void GetResponse()
     {
         if (inputField.text.Length < 1)
             return;
@@ -52,11 +66,15 @@ public class OpenAIController : MonoBehaviour
         // fill user message from input field
         ChatMessage userMessage = new ChatMessage();
         userMessage.Role = ChatMessageRole.User;
-        userMessage.Content = inputField.text;
+        //userMessage.Content = inputField.text;
+
+        //var a = inputField.text;
+        Debug.Log($"Message: {messageToSend}");
+        userMessage.Content = messageToSend;
 
         if (userMessage.Content.Length > 3000)
         {
-            // limit messages to 100 characters
+            // limit messages to 3000 characters
             userMessage.Content = userMessage.Content.Substring(0, 3000);
         }
         
