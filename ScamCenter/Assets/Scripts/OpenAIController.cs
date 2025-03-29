@@ -17,6 +17,8 @@ public class OpenAIController : MonoBehaviour
     [SerializeField] private Button okButton;
     [SerializeField] private Button stopRecordingButton; // just to listen for an event
 
+
+    [SerializeField] private BankUIManager bankManager;
     private OpenAIAPI _api;
     private List<ChatMessage> _messages;
 
@@ -115,9 +117,12 @@ public class OpenAIController : MonoBehaviour
         
         // re-enable ok button
         okButton.enabled = true;
-        
-        if(responseMessage.Content.EndsWith("I sent the money."))
+
+        if (responseMessage.Content.EndsWith("I sent the money."))
+        {
+            bankManager.GainMoney();
             Debug.Log("you won!");
+        }
         
         if(responseMessage.Content.EndsWith("Goodbye.") || responseMessage.Content.EndsWith("Goodbye"))
             Debug.Log("you lose...");
