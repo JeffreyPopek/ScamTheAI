@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class WindowManager : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
+    public WindowOrderingManager.Windows windowType;
+    
     [Header("UI Elements")] 
     [SerializeField] private GameObject window;
     [SerializeField] private Button xButton;
@@ -13,8 +15,11 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IDragHandler
     [SerializeField] private RectTransform draggableArea;
 
 
+    public bool startMinimized;
+    public bool settings;
+    
     private bool _isWindowOpen;
-    private readonly Vector2 _offScreenPos = new Vector2(-6000, -6000);
+    private readonly Vector2 _offScreenPos = new Vector2(-2000, 94);
     private Vector2 _lastPos;
     private RectTransform _windowRectTransform;
     private Vector2 _offset;
@@ -22,22 +27,35 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IDragHandler
     private void Awake()
     {
         _isWindowOpen = true;
-        
+
         xButton.onClick.AddListener(()=>ToggleWindow());
-        taskbarIcon.onClick.AddListener(()=>ToggleWindow());
+        
+        if(!settings)
+            taskbarIcon.onClick.AddListener(()=>ToggleWindow());
 
         _windowRectTransform = window.GetComponent<RectTransform>();
         _lastPos = _windowRectTransform.anchoredPosition;
+        
+        if (startMinimized)
+            ToggleWindow();
     }
 
     private void ToggleWindow()
     {
         if (_isWindowOpen)
         {
-            _lastPos = _windowRectTransform.anchoredPosition;
-            _isWindowOpen = false;
-            taskbarHighlight.SetActive(false);
-            _windowRectTransform.anchoredPosition = _offScreenPos;
+            if (settings)
+            {
+                WindowsButtonManager.instance.settingsOpen = false;
+                _windowRectTransform.anchoredPosition = _offScreenPos;
+            }
+            else
+            {
+                _lastPos = _windowRectTransform.anchoredPosition;
+                _isWindowOpen = false;
+                taskbarHighlight.SetActive(false);
+                _windowRectTransform.anchoredPosition = _offScreenPos;
+            }
         }
         else
         {
@@ -55,6 +73,8 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IDragHandler
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_windowRectTransform.parent as RectTransform, eventData.position, eventData.pressEventCamera, out _offset);
             _offset = (Vector2)_windowRectTransform.localPosition - _offset;
         }
+        
+        WindowOrderingManager.instance.SetToTop(windowType);
     }
 
     public void OnDrag(PointerEventData eventData)

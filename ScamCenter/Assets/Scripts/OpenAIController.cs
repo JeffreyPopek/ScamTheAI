@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using OpenAI_API;
 using OpenAI_API.Chat;
@@ -6,7 +7,6 @@ using OpenAI_API.Models;
 using Samples.Whisper;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class OpenAIController : MonoBehaviour
@@ -22,6 +22,10 @@ public class OpenAIController : MonoBehaviour
     private OpenAIAPI _api;
     private List<ChatMessage> _messages;
 
+    [Header("Win/Lose States")] 
+    [SerializeField] private GameObject chatOn;
+    [SerializeField] private GameObject chatEnded;
+
     public string messageToSend = "";
 
     // DO NOT CALL API MORE THAN ONCE A FRAME IT COSTS MONEY
@@ -30,7 +34,11 @@ public class OpenAIController : MonoBehaviour
         _api = new OpenAIAPI(Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User));
         StartConversation();
         okButton.onClick.AddListener(() => TypedTextGetResponse());
+        chatEnded.SetActive(false);
+
     }
+
+
     
     private void StartConversation()
     {
@@ -133,9 +141,26 @@ public class OpenAIController : MonoBehaviour
             bankManager.GainMoney();
             Debug.Log("you won!");
         }
-        
-        if(responseMessage.Content.EndsWith("Goodbye.") || responseMessage.Content.EndsWith("Goodbye"))
+
+        if (responseMessage.Content.EndsWith("Goodbye.") || responseMessage.Content.EndsWith("Goodbye"))
+        {
+            StartCoroutine(CO_LoseState());
             Debug.Log("you lose...");
+        }
+    }
+    
+    
+    // lose states
+    private IEnumerator CO_LoseState()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        LoseState();
+    }
+    private void LoseState()
+    {
+        chatOn.SetActive(false);
+        chatEnded.SetActive(true);
     }
 
     
