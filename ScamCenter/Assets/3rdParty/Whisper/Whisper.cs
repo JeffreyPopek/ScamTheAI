@@ -98,32 +98,5 @@ namespace Samples.Whisper
             
             recordButton.enabled = true;
         }
-
-        private void Update()
-        {
-            // if (Input.GetMouseButtonDown(0) && !isRecording)
-            //     StartRecording();
-            
-            if (isRecording)
-            {
-                time += Time.deltaTime;
-                // progressBar.fillAmount = time / duration;
-                
-                if (time >= duration)
-                {
-                    time = 0;
-                    isRecording = false;
-                    EndRecording();
-                }
-                //
-                // if (Input.GetMouseButtonUp(0))
-                // {
-                //     isRecording = false;
-                //     EndRecording();
-                // }
-            }
-        }
-        
-        
     }
 }

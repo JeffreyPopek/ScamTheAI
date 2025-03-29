@@ -17,7 +17,7 @@ public class BankUIManager : MonoBehaviour
 
     public void GainMoney()
     {
-        balanceText.text = "10000.00";
+        balanceText.text = "2030.00";
         balanceText.color = Color.black;
 
         transactionsText.text = transactions;
