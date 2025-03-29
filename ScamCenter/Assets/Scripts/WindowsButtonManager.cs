@@ -13,6 +13,8 @@ public class WindowsButtonManager : MonoBehaviour
     [SerializeField] private Button shutdownButton;
     [SerializeField] private Button settingsButton;
 
+    [SerializeField] private GameObject windowsActive;
+
 
     private bool _windowOpen;
     public bool settingsOpen;
@@ -29,6 +31,8 @@ public class WindowsButtonManager : MonoBehaviour
     
     private void Start()
     {
+        windowsActive.SetActive(false);
+        
         windowsWindow.SetActive(false);
         settingsWindow.SetActive(false);
         _windowOpen = false;
@@ -43,11 +47,13 @@ public class WindowsButtonManager : MonoBehaviour
     {
         if (_windowOpen)
         {
+            windowsActive.SetActive(false);
             windowsWindow.SetActive(false);
             _windowOpen = false;
         }
         else
         {
+            windowsActive.SetActive(true);
             windowsWindow.SetActive(true);
             _windowOpen = true;
         }
@@ -60,6 +66,7 @@ public class WindowsButtonManager : MonoBehaviour
             settingsOpen = true;
             settingsWindow.SetActive(true);
             settingsWindow.GetComponent<RectTransform>().anchoredPosition = _defaultSettingsPos; 
+            WindowOrderingManager.instance.SetToTop(WindowOrderingManager.Windows.Settings);
         }
     }
 

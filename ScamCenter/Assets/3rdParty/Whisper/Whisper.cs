@@ -1,4 +1,5 @@
 ﻿using OpenAI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR;
@@ -10,7 +11,7 @@ namespace Samples.Whisper
         [SerializeField] private OpenAIController controller;
         [SerializeField] private Button recordButton;
         [SerializeField] private Button stopRecordButton;
-        [SerializeField] private Dropdown dropdown;
+        [SerializeField] private TMP_Dropdown dropdown;
         
         private readonly string fileName = "output.wav";
         private readonly int duration = 20;
@@ -34,9 +35,12 @@ namespace Samples.Whisper
             #if UNITY_WEBGL && !UNITY_EDITOR
             dropdown.options.Add(new Dropdown.OptionData("Microphone not supported on WebGL"));
             #else
+            
+            dropdown.options.Clear();
+            
             foreach (var device in Microphone.devices)
             {
-                dropdown.options.Add(new Dropdown.OptionData(device));
+                dropdown.options.Add(new TMP_Dropdown.OptionData(device));
             }
             recordButton.onClick.AddListener(StartRecording);
             stopRecordButton.onClick.AddListener(EndRecording);

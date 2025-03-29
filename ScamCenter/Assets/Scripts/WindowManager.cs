@@ -62,6 +62,7 @@ public class WindowManager : MonoBehaviour, IPointerDownHandler, IDragHandler
             _windowRectTransform.anchoredPosition = _lastPos;
             _isWindowOpen = true;
             taskbarHighlight.SetActive(true);
+            WindowOrderingManager.instance.SetToTop(windowType);
         }
     }
     
