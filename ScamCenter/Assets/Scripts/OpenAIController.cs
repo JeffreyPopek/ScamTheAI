@@ -14,8 +14,8 @@ public class OpenAIController : MonoBehaviour
     [SerializeField] private Whisper whisper;
     [SerializeField] private TextMeshProUGUI textField;
     [SerializeField] private TextMeshProUGUI inputField;
+    [SerializeField] private TMP_InputField inputFieldGO;
     [SerializeField] private Button okButton;
-    [SerializeField] private Button stopRecordingButton; // just to listen for an event
 
 
     [SerializeField] private BankUIManager bankManager;
@@ -41,7 +41,7 @@ public class OpenAIController : MonoBehaviour
         };
 
         
-        inputField.text = "";
+        inputFieldGO.text = "";
         string startString = "Reginald: Reginald speaking, and who might this be?";
         textField.text = startString;
         
@@ -51,9 +51,19 @@ public class OpenAIController : MonoBehaviour
     private void TypedTextGetResponse()
     {
         messageToSend = inputField.text;
+        inputFieldGO.text = "";
         GetResponse();
 
-        inputField.text = "";
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            Debug.Log("Clearing");
+            inputField.text = "";
+
+        }
     }
 
     public async void GetResponse()
